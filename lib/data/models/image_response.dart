@@ -1,16 +1,16 @@
 import 'package:equatable/equatable.dart';
 
 class ImageResponse extends Equatable {
-  final String imageUrl;
+  final String imageBytes;
 
-  const ImageResponse({required this.imageUrl});
+  const ImageResponse({required this.imageBytes});
 
   factory ImageResponse.fromJson(json) {
     return ImageResponse(
-      imageUrl: json["image"],
+      imageBytes: json["artifacts"][0]["base64"],
     );
   }
 
   @override
-  List<Object> get props => [imageUrl];
+  List<Object> get props => [imageBytes];
 }

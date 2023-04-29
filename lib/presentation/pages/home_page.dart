@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -86,7 +88,9 @@ class HomePage extends StatelessWidget {
                         }
 
                         if (state is ImageCompleted) {
-                          return Image(image: NetworkImage(state.imageUrl));
+                          final bytes = base64.decode(state.imageBytes);
+
+                          return Image.memory(bytes);
                         }
 
                         return const Text("wait");

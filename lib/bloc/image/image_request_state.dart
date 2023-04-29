@@ -13,12 +13,12 @@ class ImageInitial extends ImageRequestState {}
 class ImageLoading extends ImageRequestState {}
 
 class ImageCompleted extends ImageRequestState {
-  final String imageUrl;
+  final String imageBytes;
 
-  const ImageCompleted(this.imageUrl);
+  const ImageCompleted(this.imageBytes);
 
   @override
-  List<Object> get props => [imageUrl];
+  List<Object> get props => [imageBytes];
 }
 
 class ImageError extends ImageRequestState {
