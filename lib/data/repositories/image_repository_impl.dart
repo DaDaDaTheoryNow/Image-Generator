@@ -12,18 +12,10 @@ class ImageRepositoryImpl implements ImageRepository {
   @override
   Future<String> makeRequest(String description) async {
     try {
-      var response = await dio.post(
-        'https://api.deepai.org/api/fantasy-portrait-generator',
-        data: FormData.fromMap(
-          {
-            'text': description,
-            "grid_size": 1,
-          },
-        ),
+      final response = await dio.get(
+        "https://v6.rsa-api.xyz/anime/art",
         options: Options(
-          headers: {
-            'api-key': 'quickstart-QUdJIGlzIGNvbWluZy4uLi4K',
-          },
+          headers: {"Authorization": "chrnMsqPx8Ww"},
         ),
       );
 

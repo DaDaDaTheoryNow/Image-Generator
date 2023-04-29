@@ -7,7 +7,7 @@ class ImageResponse extends Equatable {
 
   factory ImageResponse.fromJson(json) {
     return ImageResponse(
-      imageUrl: json["output_url"],
+      imageUrl: json["image"],
     );
   }
 
