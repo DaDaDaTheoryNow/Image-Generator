@@ -18,7 +18,7 @@ class ImageRepositoryImpl implements ImageRepository {
   //final engineId = "stable-diffusion-v1-5";
 
   @override
-  Future<String?> makeRequest(String description) async {
+  Future<String> makeRequest(String description) async {
     try {
       // start generation
       // include link with status and cancel link
