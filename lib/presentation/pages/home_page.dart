@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/image/image_request_bloc.dart';
+import '../../blocs/image/image_request_bloc.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -88,9 +86,7 @@ class HomePage extends StatelessWidget {
                         }
 
                         if (state is ImageCompleted) {
-                          final bytes = base64.decode(state.imageBytes);
-
-                          return Image.memory(bytes);
+                          return Image(image: NetworkImage(state.imageUrl));
                         }
 
                         return const Text("wait");
