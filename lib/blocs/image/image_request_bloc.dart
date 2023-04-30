@@ -15,7 +15,8 @@ class ImageRequestBloc extends Bloc<ImageRequestEvent, ImageRequestState> {
     on<ImageRequest>((event, emit) async {
       emit(ImageLoading());
       try {
-        final response = await _imageRepository.makeRequest(event.descripion);
+        final response = await _imageRepository.makeRequest(
+            event.descripion, event.negative);
         emit(ImageCompleted(response));
       } catch (e) {
         emit(ImageError('Failed to generate text: $e'));

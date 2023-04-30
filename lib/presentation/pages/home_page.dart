@@ -1,10 +1,37 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../blocs/image/image_request_bloc.dart';
+import '../../token/token.dart';
+import '../widgets/token_dialog.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    tokenInit();
+  }
+
+  tokenInit() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final tokenPrefs = prefs.getString("token");
+
+    if (tokenPrefs == null) {
+      Future.microtask(() => showTokenDialog(context, true));
+    } else {
+      token = tokenPrefs;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,18 +43,30 @@ class HomePage extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             centerTitle: true,
-            title: const Text("Image Generator"),
-            leading: IconButton(
-                onPressed: () {}, icon: const Icon(Icons.delete_forever)),
+            title: const Text(
+              "Image Generator",
+              style: TextStyle(
+                fontSize: 17,
+              ),
+            ),
             actions: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8),
                 child: ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<ImageRequestBloc>()
-                        .add(ImageRequest(descriptionController.text));
-                  },
+                  onPressed: () => showTokenDialog(context, false),
+                  style: const ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(
+                        Color.fromARGB(255, 160, 138, 138)),
+                  ),
+                  child: const Text("Chagne Token"),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: ElevatedButton(
+                  onPressed: () => context.read<ImageRequestBloc>().add(
+                      ImageRequest(
+                          descriptionController.text, negativeController.text)),
                   child: const Text("Request"),
                 ),
               ),
@@ -66,7 +105,8 @@ class HomePage extends StatelessWidget {
                             TextField(
                               controller: negativeController,
                               decoration: const InputDecoration(
-                                  hintText: "write your negative prompts here",
+                                  hintText:
+                                      "write your negative prompts here (optional)",
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(12)))),
@@ -86,10 +126,45 @@ class HomePage extends StatelessWidget {
                         }
 
                         if (state is ImageCompleted) {
-                          return Image(image: NetworkImage(state.imageUrl));
+                          Future.microtask(() => showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    contentPadding: EdgeInsets.zero,
+                                    content: GestureDetector(
+                                      onTap: () => Navigator.pop(context),
+                                      child: Container(
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: NetworkImage(state.imageUrl),
+                                            fit: BoxFit.contain,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: const Text('OK'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ));
                         }
 
-                        return const Text("wait");
+                        return const Text(
+                          "Development by Vladsilav Smirnov - tg @DaDaDa17",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        );
                       })
                     ],
                   ),

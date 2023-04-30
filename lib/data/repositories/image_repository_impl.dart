@@ -1,24 +1,30 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+
 import 'package:image_generator/data/repositories/image_repository.dart';
 
+import '../../token/token.dart';
 import '../models/image_response.dart';
 
 class ImageRepositoryImpl implements ImageRepository {
   final dio = Dio(BaseOptions(
     headers: {
-      'Authorization': 'Token r8_SDsAHOT3BVT12WRK3IunRVJVum9wFnO0hTqyT',
       'Content-Type': 'application/json',
     },
   ));
 
-  //final apiHost = "https://api.stability.ai";
-  //final engineId = "stable-diffusion-v1-5";
+  final negativeDefault =
+      "asian, india, bad anatomy,bad proportions, blurry, cloned face, cropped, deformed, dehydrated, disfigured, duplicate, error, extra arms, extra fingers, extra legs, extra limbs, fused fingers, gross proportions, jpeg artifacts, long neck, low quality, lowres, malformed limbs, missing arms, missing legs, morbid, mutated hands, mutation, mutilated, out of frame, poorly drawn face, poorly drawn hands, signature, text, too many fingers, ugly, username, watermark, worst quality";
 
   @override
-  Future<String> makeRequest(String description) async {
+  Future<String> makeRequest(String description, String negative) async {
+    // token
+    dio.options.headers = {
+      'Authorization': 'Token $token',
+    };
+
     try {
       // start generation
       // include link with status and cancel link
@@ -26,9 +32,10 @@ class ImageRepositoryImpl implements ImageRepository {
         "https://api.replicate.com/v1/predictions",
         data: jsonEncode({
           'version':
-              "db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
+              "4049a9d8947a75a0b245e3937f194d27e3277bab4a9c1d6f81922919b65175fd",
           'input': {
             'prompt': description,
+            'negative_prompt': negative + negativeDefault,
           },
         }),
       );
@@ -50,7 +57,7 @@ class ImageRepositoryImpl implements ImageRepository {
 
         // check the response from the api for a picturу
         // every one second
-        int retries = 10;
+        int retries = 20;
         while (status == "processing" && retries > 0 || status == "starting") {
           await Future.delayed(const Duration(seconds: 1));
 
@@ -84,6 +91,14 @@ class ImageRepositoryImpl implements ImageRepository {
         throw Exception('Failed to fetch chat completions: $e');
       }
     } catch (e) {
+      if (e is DioError) {
+        if (e.response?.statusCode == 404) {
+          return throw Exception('Token Error');
+        } else if (e.response?.statusCode == 402) {
+          return throw Exception('You ran out of requests');
+        }
+      }
+
       throw Exception('Failed to fetch chat completions: $e');
     }
   }
