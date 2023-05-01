@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
                     backgroundColor: MaterialStatePropertyAll(
                         Color.fromARGB(255, 160, 138, 138)),
                   ),
-                  child: const Text("Chagne Token"),
+                  child: const Text("Change Token"),
                 ),
               ),
               Padding(
